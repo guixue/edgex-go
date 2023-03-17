@@ -10,7 +10,7 @@
 # change the following boolean flag to include or exclude the delayed start libs for builds for most of core services except support services
 INCLUDE_DELAYED_START_BUILD_CORE:="false"
 # change the following boolean flag to include or exclude the delayed start libs for builds for support services exculsively
-INCLUDE_DELAYED_START_BUILD_SUPPORT:="true"
+INCLUDE_DELAYED_START_BUILD_SUPPORT:="false"
 
 GO=go
 
@@ -86,6 +86,13 @@ tidy:
 	$(GO) mod tidy
 
 core: metadata data command
+
+
+run-data: data
+	cd ./cmd/core-data; export EDGEX_SECURITY_SECRET_STORE=false; ./core-data
+
+run-metadata: metadata
+	cd ./cmd/core-metadata; export EDGEX_SECURITY_SECRET_STORE=false; ./core-metadata
 
 metadata: cmd/core-metadata/core-metadata
 cmd/core-metadata/core-metadata:

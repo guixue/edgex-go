@@ -15,7 +15,7 @@ package redis
 
 import (
 	"fmt"
-	"os"
+	_ "os"
 	"sync"
 	"time"
 
@@ -47,9 +47,12 @@ func NewClient(config db.Configuration, lc logger.LoggingClient) (*Client, error
 		opts := []redis.DialOption{
 			redis.DialConnectTimeout(time.Duration(config.Timeout) * time.Millisecond),
 		}
-		if os.Getenv("EDGEX_SECURITY_SECRET_STORE") != "false" {
-			opts = append(opts, redis.DialPassword(config.Password))
-		}
+
+		//TAG: Guixue
+		// 关闭SECURITY，但是 redis 的秘钥也要可以设置
+		// if os.Getenv("EDGEX_SECURITY_SECRET_STORE") != "false" {
+		opts = append(opts, redis.DialPassword(config.Password))
+		//}
 
 		dialFunc := func() (redis.Conn, error) {
 			conn, err := redis.Dial(

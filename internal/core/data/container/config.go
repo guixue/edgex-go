@@ -21,6 +21,8 @@ import (
 )
 
 // ConfigurationName contains the name of data's config.ConfigurationStruct implementation in the DIC.
+// 此时的Key为： github.com/edgexfoundry/edgex-go/internal/core/data/config.ConfigurationStruct
+// 每个微服务有不同的配置， 配置默认来自于 cmd/目录下的 res/configuration.toml
 var ConfigurationName = di.TypeInstanceToName(config.ConfigurationStruct{})
 
 // ConfigurationFrom helper function queries the DIC and returns datas's config.ConfigurationStruct implementation.

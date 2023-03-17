@@ -19,6 +19,8 @@ import (
 	bootstrapConfig "github.com/edgexfoundry/go-mod-bootstrap/v3/config"
 )
 
+// 读取 toml 文件后的结构体
+
 type ConfigurationStruct struct {
 	Writable     WritableInfo
 	MessageBus   bootstrapConfig.MessageBusInfo

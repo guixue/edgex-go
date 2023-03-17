@@ -15,6 +15,8 @@
 
 package data
 
+//edgex 的采集数据库
+
 import (
 	"context"
 	"os"
@@ -38,6 +40,8 @@ import (
 )
 
 func Main(ctx context.Context, cancel context.CancelFunc, router *mux.Router) {
+
+	//服务启动计时
 	startupTimer := startup.NewStartUpTimer(common.CoreDataServiceKey)
 
 	// All common command-line flags have been moved to DefaultCommonFlags. Service specific flags can be add here,
@@ -48,8 +52,10 @@ func Main(ctx context.Context, cancel context.CancelFunc, router *mux.Router) {
 	//      flags.Parse(os.Args[1:])
 	//
 	f := flags.New()
+	//通用的服务参数， 解析参数
 	f.Parse(os.Args[1:])
 
+	//将 配置对象 添加到 依赖注入容器中
 	configuration := &config.ConfigurationStruct{}
 	dic := di.NewContainer(di.ServiceConstructorMap{
 		container.ConfigurationName: func(get di.Get) interface{} {
@@ -57,8 +63,10 @@ func Main(ctx context.Context, cancel context.CancelFunc, router *mux.Router) {
 		},
 	})
 
+	//启动 rest 服务器
 	httpServer := handlers.NewHttpServer(router, true)
 
+	//开始启动服务
 	bootstrap.Run(
 		ctx,
 		cancel,
@@ -71,12 +79,25 @@ func Main(ctx context.Context, cancel context.CancelFunc, router *mux.Router) {
 		true,
 		bootstrapConfig.ServiceTypeOther,
 		[]interfaces.BootstrapHandler{
+			// 新建数据库并启动数据库
 			pkgHandlers.NewDatabase(httpServer, configuration, container.DBClientInterfaceName).BootstrapHandler, // add v2 db client bootstrap handler
+
+			// 创建并初始化 Message Client
 			handlers.MessagingBootstrapHandler,
+
+			// 服务指标监测
 			handlers.NewServiceMetrics(common.CoreDataServiceKey).BootstrapHandler, // Must be after Messaging
-			application.BootstrapHandler,                                           // Must be after Service Metrics and before next handler
+
+			// App 启动
+			application.BootstrapHandler, // Must be after Service Metrics and before next handler
+
+			//初始化 REST 路由 并且 订阅客户端事件
 			NewBootstrap(router, common.CoreDataServiceKey).BootstrapHandler,
+
+			// 启动 HTTP 服务器
 			httpServer.BootstrapHandler,
+
+			// 输出启动成功的消息
 			handlers.NewStartMessage(common.CoreDataServiceKey, edgex.Version).BootstrapHandler,
 		},
 	)

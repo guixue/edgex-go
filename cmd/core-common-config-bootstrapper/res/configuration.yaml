@@ -5,11 +5,11 @@ all-services:
         path: "redisdb"
         Secrets:
           username: ""
-          password: ""
+          password: "123456"
         SecretName: "redisdb"
         SecretData:
           username: ""
-          password: ""
+          password: "123456"
     
     Telemetry:
       Interval: "30s"
