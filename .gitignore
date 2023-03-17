@@ -47,5 +47,3 @@ prime/*
 stage/*
 snap/.snapcraft/*
 squashfs-root/
-go.sum
-
